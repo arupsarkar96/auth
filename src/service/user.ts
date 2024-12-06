@@ -15,10 +15,10 @@ export const updateUserLocationService = async (uid: string, lat: number | null,
         throw new Error('Invalid location data: latitude or longitude out of range');
     }
 
-    const location = `POINT(${lat} ${lon})`;
+    const location = `POINT(${lon} ${lat})`;  // Ensure 'lon' and 'lat' are valid
 
     try {
-        const sql = 'UPDATE `users` SET `location` = ST_GeomFromText(?), `updated` = NOW()  WHERE `uid` = ?';
+        const sql = 'UPDATE `users` SET `location` = ST_GeomFromText(?), `updated` = NOW() WHERE `uid` = ?';
         const [rows] = await pool.query(sql, [location, uid]);
     } catch (error) {
         console.error('Error updating user location:', error);
@@ -29,7 +29,7 @@ export const updateUserLocationService = async (uid: string, lat: number | null,
 
 
 export const createUserService = async (uid: string, username: string, password: string, name: string, photo: string, hash: string, lat: number | null, lon: number | null) => {
-    const location = `POINT(${lat} ${lon})`
+    const location = `POINT(${lon} ${lat})`
     try {
         const sql = 'INSERT INTO `users` (`uid`, `username`, `password`, `name`, `photo`, `hash`, `location`) VALUES (?,?,?,?,?,?,ST_GeomFromText(?))';
         const [rows] = await pool.query(sql, [uid, username, password, name, photo, hash, location]);
