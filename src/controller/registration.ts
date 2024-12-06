@@ -6,6 +6,7 @@ import bcrypt from "bcryptjs"
 import IceId from "iceid";
 import configuration from "../config/config";
 import { createLoginController } from './login';
+import { getLocation } from '../service/location';
 
 const generator = new IceId(configuration.DATACENTER, configuration.MACHINE_ID);
 
@@ -38,8 +39,12 @@ export const createAccountController = async (username: string, password: string
     if (user === null) {
         const hashedPassword = await bcrypt.hash(password, 10);
         const characterName: string = uniqueNamesGenerator(config)
+        const ipdata = await getLocation(ip)
         const photo: string = `https://api.dicebear.com/9.x/${getRandomCharacter()}/png?seed=${characterName}&backgroundColor=${getRandomColor()}`
-        const reg = await createUserService(generator.generate(), username, hashedPassword, characterName, photo, uuidv4())
+
+        const reg = await createUserService(generator.generate(), username, hashedPassword, characterName, photo, uuidv4(), ipdata?.lat!!, ipdata?.lon!!)
+
+
         const login = await createLoginController(username, password, ip)
         return login
     } else {

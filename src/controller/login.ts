@@ -1,7 +1,7 @@
 import { generateToken } from '../config/token';
 import bcrypt from "bcryptjs"
-import { findUserByUsernameService } from '../service/user';
-import { addPresenceController } from './presence';
+import { findUserByUsernameService, updateUserLocationService } from '../service/user';
+import { getLocation } from '../service/location';
 
 
 const ACCESS_TOKEN_TTL = "3h"
@@ -27,8 +27,8 @@ export const createLoginController = async (username: string, password: string, 
 
         // Generate token (replace with your actual token generation logic)
         const token = generateToken({ username: username, type: "access" }, ACCESS_TOKEN_TTL, "key1", user.uid);
-        // For presence only
-        addPresenceController(user.uid, ip)
+        const ipdata = await getLocation(ip)
+        updateUserLocationService(user.uid, ipdata?.lat!!, ipdata?.lon!!)
         // Success response
         return {
             code: 200, data: {

@@ -6,12 +6,10 @@ const ipCache: Map<string, IPGeoLocation> = new Map();
 export const getLocation = async (ip: string): Promise<IPGeoLocation | null> => {
     // Check if the IP is already in the cache
     if (ipCache.has(ip)) {
-        console.log(`Cache hit for IP: ${ip}`);
         return ipCache.get(ip) || null;
     }
 
     try {
-        console.log(`Cache miss for IP: ${ip}. Fetching from API...`);
         const response = await fetch(`http://ip-api.com/json/${ip}`, {
             method: "GET",
         });
