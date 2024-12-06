@@ -17,7 +17,6 @@ v1Registration.use(limiter)
 v1Registration.post('/', async (req, res) => {
     const { username, password } = req.body
     const ip: string = (req.headers['x-forwarded-for'] as string) || (req.ip as string);
-
     const response = await createAccountController(username, password, ip)
 
     if (response.code === 200) {

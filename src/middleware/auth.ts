@@ -4,7 +4,7 @@ import { verifyToken } from "../config/token";
 export const authTokenChecker = (req: Request, res: Response, next: NextFunction): void => {
     const authorization = req.headers['authorization'];
     const token = authorization?.split(" ")[1]
-    console.log(token)
+
     if (!token) {
         res.status(401).json({ message: 'Access Denied: No token provided' });
         return
