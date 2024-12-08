@@ -1,44 +1,75 @@
 import { generateToken } from '../config/token';
 import bcrypt from "bcryptjs"
-import { findUserByUsernameService, updateUserLocationService } from '../service/user';
+
 import { getLocation } from '../service/location';
+import { ApiResponse } from '../interface/login';
+import { User } from '../model/User';
+import { Login } from '../model/Login';
+
+
 
 
 const ACCESS_TOKEN_TTL = "3h"
 
-export const createLoginController = async (username: string, password: string, ip: string) => {
+export const createLoginController = async (username: string, password: string, ip: string): Promise<ApiResponse> => {
+
+    if (!username || !password) {
+        return { code: 400, data: "Username and password are required" };
+    }
+
     try {
-        // Input validation
-        if (!username || !password) {
-            return { code: 400, data: { message: "Username and password are required" } };
-        }
+        const userdb = await User.findOne({ where: { username: username }, attributes: ["uid", "username", "password", "photo", "about", "verified", "visibility"] });
 
-        // Fetch user by username
-        const user = await findUserByUsernameService(username);
-        if (!user) {
-            return { code: 404, data: { message: "Username not found" } };
-        }
+        if (userdb) {
+            const user = userdb.toJSON();
+            const isMatch = await bcrypt.compare(password, user.password);
 
-        // Verify password
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
-            return { code: 403, data: { message: "Wrong password" } };
-        }
-
-        // Generate token (replace with your actual token generation logic)
-        const token = generateToken({ username: username, type: "access" }, ACCESS_TOKEN_TTL, "key1", user.uid);
-        const ipdata = await getLocation(ip)
-        updateUserLocationService(user.uid, ipdata?.lat!!, ipdata?.lon!!)
-        // Success response
-        return {
-            code: 200, data: {
-                token: token,
-                user: user
+            if (!isMatch) {
+                return { code: 403, data: "Wrong password" };
             }
-        };
 
+            const token = generateToken({ username: username }, ACCESS_TOKEN_TTL, user.uid);
+            accessHistory(ip, user.uid)
+
+
+            return {
+                code: 200, data: {
+                    token: token,
+                    user: {
+                        uid: user.uid,
+                        username: user.username,
+                        photo: user.photo,
+                        about: user.about,
+                        verified: user.verified,
+                        visibility: user.visibility
+                    }
+                }
+            }
+
+
+        } else {
+            console.log("Username not found");
+            return { code: 404, data: "Username not found" };
+        }
     } catch (error) {
-        console.error("Error in login controller:", error);
-        return { code: 500, data: { message: "Internal server error" } };
+        console.error("Error finding user:", error);
+        return { code: 500, data: "Internal server error" };
     }
 };
+
+
+
+export const accessHistory = async (ip: string, userId: string) => {
+    const ipdata = await getLocation(ip)
+    await Login.create({
+        id: 0,
+        uid: userId,
+        ip: ip,
+        country: ipdata?.country,
+        cc: ipdata?.countryCode,
+        region: ipdata?.regionName,
+        rc: ipdata?.region,
+        city: ipdata?.city,
+        location: { type: "Point", coordinates: [ipdata?.lon!!, ipdata?.lat!!] }
+    })
+}

@@ -7,13 +7,11 @@ const SECRET_KEY = configuration.JWT_SECRET;
 export const generateToken = (
     payload: object,
     expiresIn: string = '1h',
-    keyId: string,
     userId: string
 ): string => {
     return jwt.sign(payload, SECRET_KEY, {
         expiresIn: expiresIn,
         issuer: "https://auth.messant.in",
-        keyid: keyId,
         subject: userId,
         audience: ["auth", "api", "chat", "call"],
     });

@@ -1,15 +1,15 @@
-import mysql from 'mysql2/promise';
+import { Sequelize } from "sequelize";
 import configuration from './config';
 
-const pool: mysql.Pool = mysql.createPool({
-    uri: configuration.MYSQL,
-    charset: 'utf8mb4',
-    waitForConnections: true,
-    connectionLimit: 10, // Maximum number of connections in the pool
-    queueLimit: 0, // Unlimited queued requests (optional, adjust as needed)
-    multipleStatements: false, // Safer to disable unless absolutely necessary
-    connectTimeout: 10000, // Set a timeout to avoid hanging connections (in ms)
-    namedPlaceholders: true, // Enable support for named parameters if needed
+
+const sequelize = new Sequelize(configuration.MYSQL, {
+    pool: {
+        max: 75, // Maximum number of connections
+        min: 1,  // Minimum number of connections
+        acquire: 30000, // Maximum time to acquire a connection in ms
+        idle: 10000,    // Time before releasing an idle connection
+    },
+    logging: false,
 });
 
-export default pool;
+export default sequelize;

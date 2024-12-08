@@ -12,10 +12,7 @@ export const authTokenChecker = (req: Request, res: Response, next: NextFunction
 
     try {
         const data: any = verifyToken(token);
-        const type = data.type
         const aud = data.aud
-
-
 
         if (aud.includes("auth")) {
             req.headers["x-uid"] = data.sub;
