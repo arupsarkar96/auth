@@ -2,6 +2,7 @@ import express from "express"
 import fs from "node:fs"
 import morgan from "morgan"
 import bodyParser from "body-parser"
+import jose from "node-jose"
 import PrettyLogger from "./utils/pretty"
 import configuration from "./config"
 import loginRoute from "./routes/login"
@@ -23,7 +24,7 @@ app.use("/device", deviceRoute)
 app.use("/register", registerRouter)
 app.use("/token", tokenRoute)
 
-const main = () => {
+const main = async() => {
     const publicKey = fs.existsSync("./keys/public.key")
     const privateKey = fs.existsSync("./keys/private.key")
 
@@ -32,20 +33,15 @@ const main = () => {
         return
     }
 
-    const keydata = fs.readFileSync("./keys/public.key")
-    const jwtpublickey = {
-        keys: [
-            {
-                kty: 'RSA',
-                alg: 'RS256',
-                kid: '1',
-                use: 'sig',
-                n: keydata.toString('base64'), // Modulus
-                e: 'AQAB', // Exponent
-            },
-        ],
-    }
-    fs.writeFileSync('./public/.well-known/jwks.json', JSON.stringify(jwtpublickey));
+    const keydata = fs.readFileSync("./keys/public.key", "utf8")
+    const key = await jose.JWK.asKey(keydata, 'pem');
+    const jwk = key.toJSON() as any;
+    jwk.kid = '1';
+    
+    const jwks = {
+        keys: [jwk],
+    };
+    fs.writeFileSync('./public/.well-known/jwks.json', JSON.stringify(jwks, null, 2));
     Logger.Info("JWT public key deployed")
 
     app.listen(configuration.PORT, '0.0.0.0', () => {
