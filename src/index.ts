@@ -1,5 +1,6 @@
 import express from "express"
 import fs from "node:fs"
+import morgan from "morgan"
 import bodyParser from "body-parser"
 import PrettyLogger from "./utils/pretty"
 import configuration from "./config"
@@ -14,7 +15,7 @@ const Logger = new PrettyLogger()
 app.use(express.static("public"))
 app.use(express.json())
 app.use(bodyParser.urlencoded({extended: false}))
-
+app.use(morgan("common"))
 
 app.use("/login", loginRoute)
 app.use("/device", deviceRoute)
