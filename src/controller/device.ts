@@ -8,12 +8,12 @@ import {v4 as uuid} from "uuid"
 export const deviceController = async (auth_code: string, fcm_token: string, public_key: string): Promise<DeviceResponse> => {
     
     if (!auth_code || !fcm_token || !public_key) {
-        return {status:400, data: {message: "AUTH_CODE, FCM_TOKEN, PUBLIC_KEY missing "}}
+        return {status:400, data: {message: "AUTH_CODE, FCM_TOKEN, PUBLIC_KEY missing", error: "invalid_request"}}
     }
     const auths: DeviceAuth[] = await authGetService(auth_code)
 
     if (auths.length === 0) {
-        return { status: 400, data: { message: "AUTH_CODE wrong " } }
+        return { status: 400, data: { message: "AUTH_CODE wrong", error: "invalid_code" } }
     }
 
     authDeleteService(auths[0].auth_id)

@@ -6,7 +6,8 @@ export interface DeviceResponse {
 }
 
 interface DeviceError {
-    message: string
+    message: string,
+    error: string
 }
 
 interface DeviceSuccess {
