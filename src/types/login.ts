@@ -1,6 +1,7 @@
 
 export interface User {
     id: number;
+    display_name: string;
     username: string;
     password: string;
     phone: string;
@@ -16,12 +17,6 @@ export interface LoginResponse {
 }
 
 interface LoginSuccess {
-    user: {
-        username: string,
-        photo: string,
-        about: string,
-        verified: boolean
-    },
     auth_code: string
 }
 

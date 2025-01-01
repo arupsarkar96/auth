@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs"
-import { loginService, registerService } from "../service/dbservice"
+import { userFindService, registerService } from "../service/dbservice"
 import { LoginResponse } from "../types/login"
 import { loginController } from "./login"
 
@@ -16,7 +16,7 @@ export const registerController = async (username: string, password: string): Pr
     }
 
 
-    const users = await loginService(username)
+    const users = await userFindService(username)
 
     if (users.length> 0) {
         return { status: 400, data: { message: "Username already exists", error: "invalid_username" } }

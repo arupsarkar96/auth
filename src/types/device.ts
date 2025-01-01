@@ -10,6 +10,13 @@ interface DeviceError {
 }
 
 interface DeviceSuccess {
+    user: {
+        display_name: string|null
+        username: string,
+        photo: string,
+        about: string,
+        verified: boolean
+    },
     access_token: string,
     refresh_token: string
 }

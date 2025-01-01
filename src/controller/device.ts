@@ -1,5 +1,6 @@
-import { authDeleteService, authGetService, deviceInsertService } from "../service/dbservice"
+import { authDeleteService, authGetService, deviceInsertService, userFindService } from "../service/dbservice"
 import { DeviceAuth, DeviceResponse } from "../types/device"
+import { User } from "../types/login"
 import { generateAccessToken, generateRefreshToken } from "../utils/token"
 import {v4 as uuid} from "uuid"
 
@@ -18,5 +19,19 @@ export const deviceController = async (auth_code: string, fcm_token: string, pub
     authDeleteService(auths[0].auth_id)
     deviceInsertService(auths[0].user_id, fcm_token, public_key, uuid())
 
-    return {status: 200, data:{access_token: generateAccessToken(auths[0].username), refresh_token: generateRefreshToken(auths[0].username)}}
+    const users: User[] = await userFindService(auths[0].username)
+    const user = users[0]
+    return {
+        status: 200, data: {
+            user: {
+                display_name: user.display_name,
+                username: user.username,
+                about: user.about,
+                photo: user.photo,
+                verified: user.verified
+            },
+            access_token: generateAccessToken(auths[0].username),
+            refresh_token: generateRefreshToken(auths[0].username)
+        }
+    }
 }

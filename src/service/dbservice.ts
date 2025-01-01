@@ -5,7 +5,7 @@ import PrettyLogger from "../utils/pretty";
 
 const Logger = new PrettyLogger()
 
-export const loginService = async (username: string): Promise<User[]> => {
+export const userFindService = async (username: string): Promise<User[]> => {
     const sql = "SELECT * FROM `users` WHERE `username` = ?"
     try {
         const [rows] = await database.query(sql, [username])

@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs"
 import { v4 as uuid } from "uuid"
-import { authInsertService, loginService } from "../service/dbservice"
+import { authInsertService, userFindService } from "../service/dbservice"
 import { LoginResponse } from "../types/login"
 
 
@@ -15,7 +15,7 @@ export const loginController = async(username: string, password: string): Promis
     }
 
 
-    const users = await loginService(username)
+    const users = await userFindService(username)
 
     if (users.length === 0) {
         return { status: 400, data: { message: "Username not found", error: "invalid_username" } }
@@ -36,12 +36,7 @@ export const loginController = async(username: string, password: string): Promis
 
     return {
         status: 200, data: {
-            user: {
-                username: user.username,
-                photo: user.photo,
-                about: user.about,
-                verified: user.verified
-            }, auth_code: authCode
+            auth_code: authCode
         }
     }
 
