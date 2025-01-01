@@ -47,8 +47,10 @@ export const authDeleteService = async (auth_code: number) => {
 }
 
 export const deviceInsertService = async (userId: number, fcm: string, public_key: string, device_id: string) => {
+    const sql0 = "DELETE FROM  `devices` WHERE `user_id` = ?"
     const sql = "INSERT INTO `devices` (`device_id`, `user_id`, `fcm_token`, `public_key`) VALUES (?,?,?,?)"
     try {
+        await database.query(sql0, [userId])
         const [rows] = await database.query(sql, [device_id, userId, fcm, public_key])
     } catch (error: any) {
         Logger.Error(error.message)

@@ -12,6 +12,7 @@ const app = express()
 
 const Logger = new PrettyLogger()
 
+app.set('trust proxy', '192.168.1.100');
 app.use(express.static("public"))
 app.use(express.json())
 app.use(bodyParser.urlencoded({extended: false}))
