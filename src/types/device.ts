@@ -16,7 +16,8 @@ interface DeviceSuccess {
         username: string,
         photo: string,
         about: string,
-        verified: boolean
+        verified: boolean,
+        is_private: boolean
     },
     access_token: string,
     refresh_token: string

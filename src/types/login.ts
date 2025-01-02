@@ -8,7 +8,8 @@ export interface User {
     photo: string;  // Assuming photo can be null
     about: string;  // Assuming about can be null
     verified: boolean;
-    visibility: boolean;   // Modify visibility type as per your actual implementation (e.g., 'public', 'private')
+    visibility: boolean;
+    is_private: boolean
 }
 
 export interface LoginResponse {
