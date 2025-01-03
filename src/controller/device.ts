@@ -28,8 +28,8 @@ export const deviceController = async (auth_code: string, fcm_token: string, pub
                 username: user.username,
                 about: user.about,
                 photo: user.photo,
-                verified: user.verified,
-                is_private: user.is_private
+                verified: !!user.verified,
+                is_private: !!user.is_private
             },
             access_token: generateAccessToken(auths[0].username),
             refresh_token: generateRefreshToken(auths[0].username)
