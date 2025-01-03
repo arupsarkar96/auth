@@ -67,3 +67,12 @@ export const registerService = async (username: string, hashedPassword: string, 
         return false
     }
 }
+
+export const presenceCreateService = async (username: string, ipAddress: string, city: string | null, region: string | null, country: string | null, lat: number, lon: number) => {
+    const sql = "INSERT INTO `presence` (`username`, `ip_address`, `region`, `city`, `country`, `lat`, `lon`) VALUES (?,?,?,?,?,?,?)"
+    try {
+        const [rows] = await database.query(sql, [username, ipAddress, region, city, country, lat, lon])
+    } catch (error: any) {
+        Logger.Error(error.message)
+    }
+}

@@ -9,6 +9,9 @@ import loginRoute from "./routes/login"
 import deviceRoute from "./routes/device"
 import registerRouter from "./routes/register"
 import tokenRoute from "./routes/token"
+import { verifyToken } from "./utils/token"
+import { JwtPayload } from "./types/token"
+import { presenceController } from "./controller/presence"
 const app = express()
 
 const Logger = new PrettyLogger()
@@ -23,6 +26,32 @@ app.use("/login", loginRoute)
 app.use("/device", deviceRoute)
 app.use("/register", registerRouter)
 app.use("/token", tokenRoute)
+
+app.post("/introspect", (req, res) => {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        res.status(401).json({ error: 'Authorization token missing or malformed' });
+        return
+    }
+
+    const token = authHeader.split(' ')[1];
+
+    // Decode the token without verifying to extract the issuer
+    try {
+        const verify: JwtPayload = verifyToken(token)
+
+        if (verify.aud.includes("auth")) {
+            res.sendStatus(200)
+            presenceController(verify.sub, "160.238.95.138")
+        } else {
+            res.status(401).json({ error: 'Token misuse' });
+        }
+
+    } catch (error) {
+        res.status(401).json({ error: 'Token expired !' });
+    }
+
+})
 
 const main = async() => {
     const publicKey = fs.existsSync("./keys/public.key")
